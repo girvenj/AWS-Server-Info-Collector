@@ -67,12 +67,15 @@ Function Get-SQLServerPSModule {
         }
     }
 
-    Write-Output 'INFO: Downloading and installing the SQL Server PowerShell module'
-    Try {
-        Install-Module 'SqlServer' -AllowClobber -Force -ErrorAction Stop
-    } Catch [System.Exception] {
-        Write-Output "ERROR: Failed to download and install the SQL Server PowerShell module $_"
-        Exit 1
+    $ModPresent = Get-Module -Name 'SqlServer' -ListAvailable | Select-Object -ExpandProperty 'Version' | Select-Object -ExpandProperty 'Major'
+    If (-not $ModPresent -or $ModPresent -lt 21) {
+        Write-Output 'INFO: Downloading and installing the SQL Server PowerShell module'
+        Try {
+            Install-Module 'SqlServer' -AllowClobber -Force -ErrorAction Stop
+        } Catch [System.Exception] {
+            Write-Output "ERROR: Failed to download and install the SQL Server PowerShell module $_"
+            Exit 1
+        }
     }
 }
 
